@@ -1,0 +1,145 @@
+# ==========================================================
+# rules/event_types/gps_tracker.v1.yml
+#
+# 20% CONFIG — validation rules for the GPS Tracker sensor.
+# Uses the full rule engine capability.
+#
+# Rule types available (all in rule_engine.py, zero code changes):
+#   required     | between      | regex   | enum
+#   not_future   | not_null_if  | geo_bounds
+#   min_length   | max_length   | timestamp | optional
+#
+# severity:
+#   error (default) — row routed to DLQ, excluded from Gold
+#   warn            — also routed to DLQ (platform decision)
+# ==========================================================
+
+event_type: gps_tracker.v1
+
+rules:
+
+  # ── Required fields ──────────────────────────────────────
+
+  - name: device_id_required
+    field: device_id
+    type: required
+    severity: error
+
+  - name: event_time_utc_required
+    field: event_time_utc
+    type: required
+    severity: error
+
+  - name: location_required
+    field: location
+    type: required
+    severity: error
+    description: "GPS location struct must be present"
+
+  # ── Timestamp validity ────────────────────────────────────
+
+  - name: event_time_parseable
+    field: event_time_utc
+    type: timestamp
+    severity: error
+    description: "event_time_utc must parse as a valid timestamp"
+
+  - name: event_time_not_future
+    field: event_time_utc
+    type: not_future
+    severity: error
+    description: "GPS timestamps must not be in the future"
+
+  # ── Geo bounds (entire world — catches corrupt coordinates) ──
+
+  - name: location_bounds_valid
+    field: location
+    type: geo_bounds
+    min_lat: -90
+    max_lat:  90
+    min_lon: -180
+    max_lon:  180
+    severity: error
+    description: "Latitude must be -90 to 90, Longitude -180 to 180"
+
+  # ── Speed ─────────────────────────────────────────────────
+
+  - name: speed_kmh_range
+    field: speed_kmh
+    type: between
+    min: 0
+    max: 350
+    allow_null: true
+    severity: error
+    description: "Speed must be 0–350 km/h when present"
+
+  # ── Heading ───────────────────────────────────────────────
+
+  - name: heading_deg_range
+    field: heading_deg
+    type: between
+    min: 0
+    max: 360
+    allow_null: true
+    severity: error
+
+  # ── Altitude ──────────────────────────────────────────────
+
+  - name: altitude_range
+    field: altitude_m
+    type: between
+    min: -500
+    max: 10000
+    allow_null: true
+    severity: warn
+    description: "Altitude outside -500m to 10000m is suspicious (warn)"
+
+  # ── GPS accuracy ──────────────────────────────────────────
+
+  - name: accuracy_range
+    field: accuracy_m
+    type: between
+    min: 0
+    max: 5000
+    allow_null: true
+    severity: warn
+    description: "Accuracy > 5000m is unreliable (warn)"
+
+  # ── Satellite count ───────────────────────────────────────
+
+  - name: satellite_count_range
+    field: satellite_count
+    type: between
+    min: 0
+    max: 50
+    allow_null: true
+    severity: warn
+
+  # ── Battery ───────────────────────────────────────────────
+
+  - name: battery_pct_range
+    field: battery_pct
+    type: between
+    min: 0
+    max: 100
+    allow_null: true
+    severity: warn
+
+  # ── Fix type enum ─────────────────────────────────────────
+
+  - name: fix_type_enum
+    field: fix_type
+    type: enum
+    values: ["2D", "3D", "none"]
+    allow_null: true
+    severity: warn
+    description: "fix_type must be 2D, 3D, or none when present"
+
+  # ── Device ID format (regex) ──────────────────────────────
+
+  - name: device_id_format
+    field: device_id
+    type: min_length
+    min: 3
+    severity: error
+    description: "device_id must be at least 3 characters"

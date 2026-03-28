@@ -1,0 +1,141 @@
+# ==========================================================
+# rules/event_types/human_presence.v1.yml
+#
+# 20% CONFIG — validation rules for the Human Presence sensor.
+# ==========================================================
+
+event_type: human_presence.v1
+
+rules:
+
+  # ── Required fields ──────────────────────────────────────
+
+  - name: device_id_required
+    field: device_id
+    type: required
+    severity: error
+
+  - name: event_time_utc_required
+    field: event_time_utc
+    type: required
+    severity: error
+
+  - name: presence_detected_required
+    field: presence_detected
+    type: required
+    severity: error
+    description: "Core boolean payload — must always be present"
+
+  - name: zone_id_required
+    field: zone_id
+    type: required
+    severity: error
+
+  # ── Timestamp validity ────────────────────────────────────
+
+  - name: event_time_parseable
+    field: event_time_utc
+    type: timestamp
+    severity: error
+
+  - name: event_time_not_future
+    field: event_time_utc
+    type: not_future
+    severity: error
+
+  # ── Occupancy count ───────────────────────────────────────
+
+  - name: occupancy_count_range
+    field: occupancy_count
+    type: between
+    min: 0
+    max: 500
+    allow_null: true
+    severity: error
+    description: "Occupancy count must be 0–500 when reported"
+
+  # ── Occupancy only valid when presence detected ───────────
+  # If presence_detected=false, occupancy_count should be 0 or null
+
+  - name: occupancy_zero_when_no_presence
+    field: occupancy_count
+    type: not_null_if
+    watch_field: presence_detected
+    watch_value: "true"
+    allow_null: true
+    severity: warn
+    description: "If presence detected, occupancy_count should be reported"
+
+  # ── Confidence ────────────────────────────────────────────
+
+  - name: confidence_range
+    field: confidence_pct
+    type: between
+    min: 0
+    max: 100
+    allow_null: true
+    severity: warn
+
+  # ── Sensor type enum ──────────────────────────────────────
+
+  - name: sensor_type_enum
+    field: sensor_type
+    type: enum
+    values: ["PIR", "MMWAVE", "IR", "ULTRASONIC"]
+    allow_null: true
+    severity: warn
+
+  # ── Detection distance ────────────────────────────────────
+
+  - name: detection_distance_range
+    field: detection_distance_m
+    type: between
+    min: 0
+    max: 100
+    allow_null: true
+    severity: warn
+
+  # ── Ambient light ─────────────────────────────────────────
+
+  - name: ambient_light_range
+    field: ambient_light_lux
+    type: between
+    min: 0
+    max: 200000
+    allow_null: true
+    severity: warn
+
+  # ── Temperature ───────────────────────────────────────────
+
+  - name: temperature_c_range
+    field: temperature_c
+    type: between
+    min: -40
+    max: 85
+    allow_null: true
+    severity: warn
+    description: "Ambient temperature must be within sensor operating range"
+
+  # ── Battery ───────────────────────────────────────────────
+
+  - name: battery_pct_range
+    field: battery_pct
+    type: between
+    min: 0
+    max: 100
+    allow_null: true
+    severity: warn
+
+  # ── Zone ID format ────────────────────────────────────────
+
+  - name: zone_id_min_length
+    field: zone_id
+    type: min_length
+    min: 2
+    severity: error
+
+  - name: device_id_min_length
+    field: device_id
+    type: min_length
+    min: 3
+    severity: error

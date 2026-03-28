@@ -1,0 +1,130 @@
+# ==========================================================
+# schemas/event_types/cold_storage_reading.v1.yml
+#
+# Cold Storage vertical — temperature chamber monitoring.
+# identity_field: chamber_id  (NOT device_id)
+# time_field:     recorded_at (NOT event_time_utc)
+#
+# Zero Python changes needed. Drop this file + rules file
+# + 3 lines in tenant config = fully onboarded.
+# ==========================================================
+
+event_type: cold_storage_reading.v1
+description: "Cold storage chamber temperature and environment monitoring"
+
+# These two lines are the ONLY thing that differs from a sensor event.
+# Everything else — Bronze, Silver, Gold, rules — handles it automatically.
+identity_field: chamber_id
+time_field:     recorded_at
+
+fields:
+  - name: chamber_id
+    type: string
+    nullable: false
+    description: "Unique chamber identifier e.g. CHBR-A1, FREEZER-3"
+
+  - name: recorded_at
+    type: string
+    nullable: false
+    description: "UTC timestamp of reading. Format: YYYY-MM-DD HH:MM:SS"
+
+  - name: temperature_c
+    type: double
+    nullable: false
+    description: "Chamber temperature in Celsius"
+
+  - name: setpoint_c
+    type: double
+    nullable: true
+    description: "Target setpoint in Celsius"
+
+  - name: humidity_pct
+    type: double
+    nullable: true
+    description: "Relative humidity percentage 0-100"
+
+  - name: door_open
+    type: boolean
+    nullable: true
+    description: "True if chamber door is currently open"
+
+  - name: compressor_running
+    type: boolean
+    nullable: true
+    description: "True if compressor is active"
+
+  - name: defrost_active
+    type: boolean
+    nullable: true
+    description: "True if defrost cycle is running"
+
+  - name: alarm_active
+    type: boolean
+    nullable: true
+    description: "True if any alarm condition is present"
+
+  - name: alarm_code
+    type: string
+    nullable: true
+    description: "Alarm code if alarm_active. E.g. HIGH_TEMP, DOOR_OPEN, SENSOR_FAULT"
+
+  - name: temperature_deviation_c
+    type: double
+    nullable: true
+    description: "Difference between actual and setpoint temperature"
+
+  - name: location
+    type: string
+    nullable: true
+    description: "Physical location e.g. Warehouse-A, Floor-2"
+
+  - name: unit_id
+    type: string
+    nullable: true
+    description: "Refrigeration unit controlling this chamber"
+
+gold:
+  curated_columns:
+    - tenant_id
+    - site_id
+    - source_id
+    - entity_id
+    - event_type
+    - schema_version
+    - source_system
+    - event_id
+    - event_time_utc
+    - event_date
+    - ingest_time_utc
+    - ingest_date
+    - chamber_id
+    - temperature_c
+    - setpoint_c
+    - humidity_pct
+    - door_open
+    - compressor_running
+    - defrost_active
+    - alarm_active
+    - alarm_code
+    - temperature_deviation_c
+    - location
+    - unit_id
+    - attributes
+
+  metrics:
+    grain: hour
+    aggregations:
+      - field: event_id
+        ops: [count]
+
+      - field: temperature_c
+        ops: [avg, min, max]
+
+      - field: setpoint_c
+        ops: [avg]
+
+      - field: temperature_deviation_c
+        ops: [avg, max]
+
+      - field: humidity_pct
+        ops: [avg, min, max]

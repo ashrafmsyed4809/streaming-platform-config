@@ -1,0 +1,120 @@
+# ==========================================================
+# schemas/event_types/human_presence.v1.yml
+#
+# 20% CONFIG — Human Presence sensor onboarding.
+# Covers PIR, mmWave radar, and occupancy sensors.
+# Zero Python changes required.
+# ==========================================================
+
+event_type: human_presence.v1
+description: "Human presence/occupancy sensor — PIR, mmWave radar, or IR-based"
+
+fields:
+  - name: device_id
+    type: string
+    nullable: false
+    description: "Sensor device identifier"
+
+  - name: event_time_utc
+    type: string
+    nullable: false
+    description: "UTC timestamp of detection. Format: YYYY-MM-DD HH:MM:SS"
+
+  - name: presence_detected
+    type: boolean
+    nullable: false
+    description: "True = presence detected, False = area clear"
+
+  - name: occupancy_count
+    type: integer
+    nullable: true
+    description: "Estimated number of people in zone (mmWave sensors only). Null for PIR."
+
+  - name: zone_id
+    type: string
+    nullable: false
+    description: "Zone or room identifier (e.g. office-3F-A, lobby-main)"
+
+  - name: confidence_pct
+    type: double
+    nullable: true
+    description: "Detection confidence 0–100%. Null for binary PIR sensors."
+
+  - name: sensor_type
+    type: string
+    nullable: true
+    description: "Sensor technology: PIR | MMWAVE | IR | ULTRASONIC"
+
+  - name: detection_distance_m
+    type: double
+    nullable: true
+    description: "Distance to detected presence in metres. Null if not supported."
+
+  - name: ambient_light_lux
+    type: double
+    nullable: true
+    description: "Ambient light level in lux at detection time. Optional."
+
+  - name: temperature_c
+    type: double
+    nullable: true
+    description: "Ambient temperature in Celsius at detection time. Optional."
+
+  - name: battery_pct
+    type: double
+    nullable: true
+    description: "Sensor battery percentage (0–100). Null if wired."
+
+  - name: firmware_version
+    type: string
+    nullable: true
+
+gold:
+  curated_columns:
+    - tenant_id
+    - site_id
+    - source_id
+    - device_id
+    - event_type
+    - schema_version
+    - source_system
+    - event_id
+    - event_time_utc
+    - event_date
+    - ingest_time_utc
+    - ingest_date
+    - presence_detected
+    - occupancy_count
+    - zone_id
+    - confidence_pct
+    - sensor_type
+    - detection_distance_m
+    - ambient_light_lux
+    - temperature_c
+    - battery_pct
+    - firmware_version
+    - attributes
+
+  metrics:
+    grain: hour
+    aggregations:
+      - field: event_id
+        ops: [count]          # total presence events per hour
+
+      - field: occupancy_count
+        ops: [avg, max, sum]  # avg/peak/total occupancy
+
+      - field: confidence_pct
+        ops: [avg, min]
+
+      - field: detection_distance_m
+        ops: [avg, max]
+
+      - field: ambient_light_lux
+        ops: [avg, min, max]
+
+      - field: temperature_c
+        ops: [avg, min, max]
+
+      - field: battery_pct
+        ops: [avg, min]

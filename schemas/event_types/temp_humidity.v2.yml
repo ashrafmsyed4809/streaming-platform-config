@@ -1,0 +1,81 @@
+# ==========================================================
+# schemas/event_types/temp_humidity.v2.yml
+#
+# 20% CONFIG — existing sensor migrated to new unified format.
+# Functionally identical to the original contract + JSON schema.
+# Now also drives Gold curated columns and metrics.
+# ==========================================================
+
+event_type: temp_humidity.v2
+description: "Temperature and humidity sensor — SHT4x series"
+
+fields:
+  - name: device_id
+    type: string
+    nullable: false
+
+  - name: event_time_utc
+    type: string
+    nullable: false
+    description: "UTC timestamp. Format: YYYY-MM-DD HH:MM:SS"
+
+  - name: temperature_f
+    type: double
+    nullable: false
+
+  - name: humidity_pct
+    type: double
+    nullable: false
+
+  - name: battery_pct
+    type: double
+    nullable: true
+
+  - name: firmware_version
+    type: string
+    nullable: true
+
+  - name: sensor
+    type: string
+    nullable: false
+
+  - name: serial_number
+    type: string
+    nullable: false
+
+gold:
+  curated_columns:
+    - tenant_id
+    - site_id
+    - source_id
+    - device_id
+    - event_type
+    - schema_version
+    - source_system
+    - event_id
+    - event_time_utc
+    - event_date
+    - ingest_time_utc
+    - ingest_date
+    - temperature_f
+    - humidity_pct
+    - battery_pct
+    - firmware_version
+    - sensor
+    - serial_number
+    - attributes
+
+  metrics:
+    grain: hour
+    aggregations:
+      - field: event_id
+        ops: [count]
+
+      - field: temperature_f
+        ops: [avg, min, max]
+
+      - field: humidity_pct
+        ops: [avg, min, max]
+
+      - field: battery_pct
+        ops: [avg, min]

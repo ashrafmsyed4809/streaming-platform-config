@@ -1,0 +1,51 @@
+# ==========================================================
+# configs/tenants/_template/dev.yml
+#
+# UNIVERSAL TENANT ONBOARDING TEMPLATE
+# Copy this folder → rename to your tenant_id → fill in blanks.
+#
+# Works for ANY vertical on Azure Event Hub:
+#   IoT Sensors     → device_id  → temp_humidity, gps_tracker
+#   Cold Storage    → chamber_id → cold_storage_reading
+#   HVAC            → unit_id    → hvac_status
+#   Retail/POS      → terminal_id→ pos_transaction
+#   Logistics       → vehicle_id → shipment_status
+#   Healthcare      → patient_id → vitals_reading
+#   Manufacturing   → machine_id → machine_telemetry
+#   Energy          → meter_id   → energy_reading
+# ==========================================================
+
+tenant:
+  tenant_id: "YOUR_TENANT_ID"
+  site_id_default: "YOUR_SITE_ID"
+
+ingestion:
+  source: "eventhub"
+  eventhub_name: "YOUR_EVENTHUB_NAME"
+  consumer_group: "$Default"
+  source_id: "YOUR_SOURCE_ID"
+
+storage:
+  base_path: "abfss://streaming@YOUR_STORAGE_ACCOUNT.dfs.core.windows.net/platform"
+
+events:
+  allowed_event_types:
+    - "your_event_type.v1"
+
+  entity_registry:
+    YOUR_ENTITY_001: "your_event_type.v1"
+
+gold:
+  curated:
+    enabled: true
+    output_subpath: "gold_curated"
+  metrics:
+    enabled: true
+    output_subpath: "gold_metrics"
+  mode: "daily"
+  run_date: ""
+  lookback_days: 1
+  event_types:
+    your_event_type.v1:
+      metrics:
+        grain: "hour"

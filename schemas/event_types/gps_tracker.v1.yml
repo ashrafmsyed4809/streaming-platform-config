@@ -1,0 +1,129 @@
+# ==========================================================
+# schemas/event_types/gps_tracker.v1.yml
+#
+# 20% CONFIG — add this file to onboard a GPS Tracker sensor.
+# Zero Python changes required.
+#
+# This file drives:
+#   • Silver parsing  (schema_engine builds the Spark schema)
+#   • Silver contract validation (required/nullable per field)
+#   • Gold curated column selection
+#   • Gold metrics aggregation (grain + aggregations)
+# ==========================================================
+
+event_type: gps_tracker.v1
+description: "GPS vehicle/asset tracker — reports location, speed, heading"
+
+# ----------------------------------------------------------
+# FIELDS
+# Supported types: string | double | float | long | integer |
+#                  boolean | timestamp | date | geo_point |
+#                  array<string> | array<double>
+# nullable: false = required field (contract violation if null)
+# ----------------------------------------------------------
+fields:
+  - name: device_id
+    type: string
+    nullable: false
+    description: "Unique tracker device identifier"
+
+  - name: event_time_utc
+    type: string
+    nullable: false
+    description: "UTC timestamp from device. Format: YYYY-MM-DD HH:MM:SS"
+
+  - name: location
+    type: geo_point
+    nullable: false
+    description: "GPS coordinates — struct with latitude and longitude (WGS84)"
+
+  - name: speed_kmh
+    type: double
+    nullable: true
+    description: "Vehicle speed in km/h. Null if stationary or unavailable."
+
+  - name: heading_deg
+    type: double
+    nullable: true
+    description: "Compass heading in degrees (0–360). Null if unknown."
+
+  - name: altitude_m
+    type: double
+    nullable: true
+    description: "Altitude above sea level in metres. Optional."
+
+  - name: accuracy_m
+    type: double
+    nullable: true
+    description: "GPS accuracy radius in metres. Null if unavailable."
+
+  - name: satellite_count
+    type: integer
+    nullable: true
+    description: "Number of satellites used for fix. Optional."
+
+  - name: battery_pct
+    type: double
+    nullable: true
+    description: "Device battery percentage (0–100). Null if not reported."
+
+  - name: fix_type
+    type: string
+    nullable: true
+    description: "GPS fix type: 2D | 3D | none"
+
+  - name: serial_number
+    type: string
+    nullable: true
+    description: "Hardware serial number of the tracker."
+
+# ----------------------------------------------------------
+# GOLD CONFIG
+# Drives build_gold_curated() and build_gold_metrics()
+# in gold_engine.py — zero Python changes needed.
+# ----------------------------------------------------------
+gold:
+  curated_columns:
+    - tenant_id
+    - site_id
+    - source_id
+    - device_id
+    - event_type
+    - schema_version
+    - source_system
+    - event_id
+    - event_time_utc
+    - event_date
+    - ingest_time_utc
+    - ingest_date
+    - location           # geo_point struct — kept as-is
+    - speed_kmh
+    - heading_deg
+    - altitude_m
+    - accuracy_m
+    - satellite_count
+    - battery_pct
+    - fix_type
+    - serial_number
+    - attributes
+
+  metrics:
+    grain: hour          # hour | day
+    aggregations:
+      - field: event_id
+        ops: [count]     # → event_count
+
+      - field: speed_kmh
+        ops: [avg, min, max]
+
+      - field: altitude_m
+        ops: [avg, min, max]
+
+      - field: accuracy_m
+        ops: [avg, min, max]
+
+      - field: battery_pct
+        ops: [avg, min]
+
+      - field: satellite_count
+        ops: [avg, min]

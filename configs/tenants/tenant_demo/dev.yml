@@ -1,0 +1,75 @@
+# ==========================================================
+# configs/tenants/tenant_demo/dev.yml
+# Full demo — all verticals proving the 80/20 platform
+# ==========================================================
+
+tenant:
+  tenant_id: "tenant_demo"
+  site_id_default: "site_demo"
+
+ingestion:
+  source: "eventhub"
+  eventhub_name: "iot-sensor-events"
+  consumer_group: "$Default"
+  source_id: "demo_source_01"
+
+storage:
+  base_path: "abfss://streaming@dataengineeringstor.dfs.core.windows.net/platform"
+
+events:
+  allowed_event_types:
+    # IoT / Sensors
+    - "temp_humidity.v2"
+    - "gps_tracker.v1"
+    - "rfid_reader.v1"
+    - "human_presence.v1"
+    # Cold Storage vertical
+    - "cold_storage_reading.v1"
+    # HVAC vertical
+    - "hvac_status.v1"
+
+  entity_registry:
+    # IoT sensors (identity_field: device_id — default)
+    pi-001: "temp_humidity.v2"
+    gps-001: "gps_tracker.v1"
+    rfid-001: "rfid_reader.v1"
+    pres-001: "human_presence.v1"
+    # Cold Storage (identity_field: chamber_id)
+    CHBR-A1: "cold_storage_reading.v1"
+    CHBR-A2: "cold_storage_reading.v1"
+    FREEZER-1: "cold_storage_reading.v1"
+    # HVAC (identity_field: unit_id)
+    AHU-01: "hvac_status.v1"
+    AHU-02: "hvac_status.v1"
+    RTU-ROOF-1: "hvac_status.v1"
+
+gold:
+  curated:
+    enabled: true
+    output_subpath: "gold_curated"
+  metrics:
+    enabled: true
+    output_subpath: "gold_metrics"
+  mode: "daily"
+  run_date: ""
+  lookback_days: 1
+
+  event_types:
+    temp_humidity.v2:
+      metrics:
+        grain: "hour"
+    gps_tracker.v1:
+      metrics:
+        grain: "hour"
+    rfid_reader.v1:
+      metrics:
+        grain: "hour"
+    human_presence.v1:
+      metrics:
+        grain: "hour"
+    cold_storage_reading.v1:
+      metrics:
+        grain: "hour"
+    hvac_status.v1:
+      metrics:
+        grain: "hour"

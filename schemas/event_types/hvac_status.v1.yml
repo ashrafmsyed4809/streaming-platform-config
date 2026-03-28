@@ -1,0 +1,135 @@
+# ==========================================================
+# schemas/event_types/hvac_status.v1.yml
+#
+# HVAC vertical — building HVAC unit status events.
+# identity_field: unit_id
+# time_field:     status_time
+# ==========================================================
+
+event_type: hvac_status.v1
+description: "HVAC unit status — temperature, airflow, mode, and fault reporting"
+
+identity_field: unit_id
+time_field:     status_time
+
+fields:
+  - name: unit_id
+    type: string
+    nullable: false
+    description: "HVAC unit identifier e.g. AHU-01, RTU-ROOF-3"
+
+  - name: status_time
+    type: string
+    nullable: false
+    description: "UTC timestamp of status report. Format: YYYY-MM-DD HH:MM:SS"
+
+  - name: zone_id
+    type: string
+    nullable: false
+    description: "Zone or area served by this unit"
+
+  - name: supply_temp_c
+    type: double
+    nullable: true
+    description: "Supply air temperature in Celsius"
+
+  - name: return_temp_c
+    type: double
+    nullable: true
+    description: "Return air temperature in Celsius"
+
+  - name: setpoint_c
+    type: double
+    nullable: true
+    description: "Temperature setpoint in Celsius"
+
+  - name: outdoor_temp_c
+    type: double
+    nullable: true
+    description: "Outdoor ambient temperature in Celsius"
+
+  - name: humidity_pct
+    type: double
+    nullable: true
+    description: "Zone relative humidity percentage"
+
+  - name: airflow_cfm
+    type: double
+    nullable: true
+    description: "Airflow in cubic feet per minute"
+
+  - name: mode
+    type: string
+    nullable: true
+    description: "Operating mode: COOLING | HEATING | FAN_ONLY | STANDBY | OFF"
+
+  - name: compressor_active
+    type: boolean
+    nullable: true
+
+  - name: fan_speed_pct
+    type: double
+    nullable: true
+    description: "Fan speed as percentage of max (0-100)"
+
+  - name: fault_active
+    type: boolean
+    nullable: true
+
+  - name: fault_code
+    type: string
+    nullable: true
+    description: "Active fault code if fault_active is true"
+
+  - name: runtime_hours
+    type: double
+    nullable: true
+    description: "Cumulative runtime hours since last reset"
+
+gold:
+  curated_columns:
+    - tenant_id
+    - site_id
+    - source_id
+    - entity_id
+    - event_type
+    - schema_version
+    - source_system
+    - event_id
+    - event_time_utc
+    - event_date
+    - ingest_time_utc
+    - ingest_date
+    - unit_id
+    - zone_id
+    - supply_temp_c
+    - return_temp_c
+    - setpoint_c
+    - outdoor_temp_c
+    - humidity_pct
+    - airflow_cfm
+    - mode
+    - compressor_active
+    - fan_speed_pct
+    - fault_active
+    - fault_code
+    - runtime_hours
+    - attributes
+
+  metrics:
+    grain: hour
+    aggregations:
+      - field: event_id
+        ops: [count]
+      - field: supply_temp_c
+        ops: [avg, min, max]
+      - field: return_temp_c
+        ops: [avg, min, max]
+      - field: setpoint_c
+        ops: [avg]
+      - field: humidity_pct
+        ops: [avg, min, max]
+      - field: airflow_cfm
+        ops: [avg, min, max]
+      - field: fan_speed_pct
+        ops: [avg, max]

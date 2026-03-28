@@ -1,0 +1,121 @@
+# ==========================================================
+# rules/event_types/rfid_reader.v1.yml
+#
+# 20% CONFIG — validation rules for the RFID Reader sensor.
+# ==========================================================
+
+event_type: rfid_reader.v1
+
+rules:
+
+  # ── Required fields ──────────────────────────────────────
+
+  - name: device_id_required
+    field: device_id
+    type: required
+    severity: error
+
+  - name: event_time_utc_required
+    field: event_time_utc
+    type: required
+    severity: error
+
+  - name: tag_id_required
+    field: tag_id
+    type: required
+    severity: error
+
+  # ── Timestamp validity ────────────────────────────────────
+
+  - name: event_time_parseable
+    field: event_time_utc
+    type: timestamp
+    severity: error
+
+  - name: event_time_not_future
+    field: event_time_utc
+    type: not_future
+    severity: error
+
+  # ── Tag ID format ─────────────────────────────────────────
+
+  - name: tag_id_min_length
+    field: tag_id
+    type: min_length
+    min: 8
+    severity: error
+    description: "EPC/UID must be at least 8 characters"
+
+  - name: tag_id_max_length
+    field: tag_id
+    type: max_length
+    max: 64
+    severity: error
+    description: "EPC/UID must not exceed 64 characters"
+
+  # ── Tag type enum ─────────────────────────────────────────
+
+  - name: tag_type_enum
+    field: tag_type
+    type: enum
+    values: ["EPC_GEN2", "ISO_15693", "ISO_14443A", "NFC"]
+    allow_null: true
+    severity: warn
+
+  # ── RSSI range ────────────────────────────────────────────
+
+  - name: rssi_range
+    field: rssi_dbm
+    type: between
+    min: -120
+    max: 0
+    allow_null: true
+    severity: warn
+    description: "RSSI must be -120 to 0 dBm when present"
+
+  # ── Read count ────────────────────────────────────────────
+
+  - name: read_count_range
+    field: read_count
+    type: between
+    min: 1
+    max: 10000
+    allow_null: true
+    severity: warn
+
+  # ── Antenna port ──────────────────────────────────────────
+
+  - name: antenna_port_range
+    field: antenna_port
+    type: between
+    min: 1
+    max: 32
+    allow_null: true
+    severity: warn
+
+  # ── Direction enum ────────────────────────────────────────
+
+  - name: direction_enum
+    field: direction
+    type: enum
+    values: ["IN", "OUT", "UNKNOWN"]
+    allow_null: true
+    severity: warn
+
+  # ── Battery ───────────────────────────────────────────────
+
+  - name: battery_pct_range
+    field: battery_pct
+    type: between
+    min: 0
+    max: 100
+    allow_null: true
+    severity: warn
+
+  # ── Device ID length ─────────────────────────────────────
+
+  - name: device_id_min_length
+    field: device_id
+    type: min_length
+    min: 3
+    severity: error

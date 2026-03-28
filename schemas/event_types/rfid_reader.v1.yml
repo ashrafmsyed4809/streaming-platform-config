@@ -1,0 +1,107 @@
+# ==========================================================
+# schemas/event_types/rfid_reader.v1.yml
+#
+# 20% CONFIG — RFID Reader sensor onboarding.
+# Zero Python changes required.
+# ==========================================================
+
+event_type: rfid_reader.v1
+description: "RFID reader — asset/personnel tag detection events"
+
+fields:
+  - name: device_id
+    type: string
+    nullable: false
+    description: "Reader device identifier"
+
+  - name: event_time_utc
+    type: string
+    nullable: false
+    description: "UTC timestamp of tag detection. Format: YYYY-MM-DD HH:MM:SS"
+
+  - name: tag_id
+    type: string
+    nullable: false
+    description: "RFID tag EPC or UID — unique identifier on the tag"
+
+  - name: tag_type
+    type: string
+    nullable: true
+    description: "Tag standard: EPC_GEN2 | ISO_15693 | ISO_14443A | NFC"
+
+  - name: rssi_dbm
+    type: double
+    nullable: true
+    description: "Received signal strength in dBm. Stronger = closer to reader."
+
+  - name: read_count
+    type: integer
+    nullable: true
+    description: "Number of times this tag was read in the detection window"
+
+  - name: antenna_port
+    type: integer
+    nullable: true
+    description: "Reader antenna port that detected the tag (1–4 typically)"
+
+  - name: zone_id
+    type: string
+    nullable: true
+    description: "Physical zone/area the reader covers (e.g. dock-01, gate-A)"
+
+  - name: direction
+    type: string
+    nullable: true
+    description: "Detected movement direction: IN | OUT | UNKNOWN"
+
+  - name: battery_pct
+    type: double
+    nullable: true
+    description: "Reader battery percentage (0–100). Null if wired."
+
+  - name: firmware_version
+    type: string
+    nullable: true
+
+gold:
+  curated_columns:
+    - tenant_id
+    - site_id
+    - source_id
+    - device_id
+    - event_type
+    - schema_version
+    - source_system
+    - event_id
+    - event_time_utc
+    - event_date
+    - ingest_time_utc
+    - ingest_date
+    - tag_id
+    - tag_type
+    - rssi_dbm
+    - read_count
+    - antenna_port
+    - zone_id
+    - direction
+    - battery_pct
+    - firmware_version
+    - attributes
+
+  metrics:
+    grain: hour
+    aggregations:
+      - field: event_id
+        ops: [count]        # → event_count (total detections)
+
+      - field: tag_id
+        ops: [count]        # → tag_id_count (tags seen — note: not distinct)
+
+      - field: rssi_dbm
+        ops: [avg, min, max]
+
+      - field: read_count
+        ops: [avg, max, sum]
+
+      - field: battery_pct
+        ops: [avg, min]

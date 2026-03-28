@@ -1,0 +1,109 @@
+# ==========================================================
+# rules/event_types/hvac_status.v1.yml
+# HVAC — validation rules
+# ==========================================================
+
+event_type: hvac_status.v1
+
+rules:
+
+  - name: unit_id_required
+    field: unit_id
+    type: required
+    severity: error
+
+  - name: status_time_required
+    field: status_time
+    type: required
+    severity: error
+
+  - name: zone_id_required
+    field: zone_id
+    type: required
+    severity: error
+
+  - name: status_time_parseable
+    field: status_time
+    type: timestamp
+    severity: error
+
+  - name: status_time_not_future
+    field: status_time
+    type: not_future
+    severity: error
+
+  - name: supply_temp_range
+    field: supply_temp_c
+    type: between
+    min: -20
+    max: 60
+    allow_null: true
+    severity: error
+
+  - name: return_temp_range
+    field: return_temp_c
+    type: between
+    min: -20
+    max: 60
+    allow_null: true
+    severity: error
+
+  - name: setpoint_range
+    field: setpoint_c
+    type: between
+    min: 10
+    max: 35
+    allow_null: true
+    severity: warn
+
+  - name: outdoor_temp_range
+    field: outdoor_temp_c
+    type: between
+    min: -50
+    max: 60
+    allow_null: true
+    severity: warn
+
+  - name: humidity_range
+    field: humidity_pct
+    type: between
+    min: 0
+    max: 100
+    allow_null: true
+    severity: error
+
+  - name: airflow_range
+    field: airflow_cfm
+    type: between
+    min: 0
+    max: 50000
+    allow_null: true
+    severity: warn
+
+  - name: fan_speed_range
+    field: fan_speed_pct
+    type: between
+    min: 0
+    max: 100
+    allow_null: true
+    severity: warn
+
+  - name: mode_enum
+    field: mode
+    type: enum
+    values: ["COOLING", "HEATING", "FAN_ONLY", "STANDBY", "OFF"]
+    allow_null: true
+    severity: warn
+
+  - name: fault_code_when_fault_active
+    field: fault_code
+    type: not_null_if
+    watch_field: fault_active
+    watch_value: "true"
+    severity: warn
+
+  - name: unit_id_min_length
+    field: unit_id
+    type: min_length
+    min: 3
+    severity: error

@@ -1,0 +1,80 @@
+# ==========================================================
+# rules/event_types/cold_storage_reading.v1.yml
+# Cold Storage — validation rules
+# ==========================================================
+
+event_type: cold_storage_reading.v1
+
+rules:
+
+  - name: chamber_id_required
+    field: chamber_id
+    type: required
+    severity: error
+
+  - name: recorded_at_required
+    field: recorded_at
+    type: required
+    severity: error
+
+  - name: temperature_c_required
+    field: temperature_c
+    type: required
+    severity: error
+
+  - name: recorded_at_parseable
+    field: recorded_at
+    type: timestamp
+    severity: error
+
+  - name: recorded_at_not_future
+    field: recorded_at
+    type: not_future
+    severity: error
+
+  # Freezer range: -40°C to +10°C (warn outside, error at extremes)
+  - name: temperature_freezer_range
+    field: temperature_c
+    type: between
+    min: -50
+    max: 20
+    severity: error
+    description: "Temperature outside -50C to +20C is a sensor or system fault"
+
+  - name: setpoint_range
+    field: setpoint_c
+    type: between
+    min: -50
+    max: 15
+    allow_null: true
+    severity: warn
+
+  - name: humidity_range
+    field: humidity_pct
+    type: between
+    min: 0
+    max: 100
+    allow_null: true
+    severity: error
+
+  - name: temperature_deviation_range
+    field: temperature_deviation_c
+    type: between
+    min: -30
+    max: 30
+    allow_null: true
+    severity: warn
+
+  - name: alarm_code_when_alarm_active
+    field: alarm_code
+    type: not_null_if
+    watch_field: alarm_active
+    watch_value: "true"
+    severity: warn
+    description: "alarm_code should be present when alarm_active is true"
+
+  - name: chamber_id_min_length
+    field: chamber_id
+    type: min_length
+    min: 3
+    severity: error
