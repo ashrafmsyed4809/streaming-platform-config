@@ -6,11 +6,12 @@ include:
 
 sync:
   include:
-    - "src/**"
-    - "schemas/**"
-    - "rules/**"
-    - "configs/**"
+    - "src/**/*"
+    - "schemas/**/*"
+    - "rules/**/*"
+    - "configs/**/*"
   exclude:
+    - "**/.git/**"
     - "**/__pycache__/**"
     - "**/*.pyc"
     - "**/*.env"

@@ -154,7 +154,7 @@ print("[runner] Event Hub config ready (namespace secret loaded, EntityPath appe
 # ==========================================================
 
 # COMMAND ----------
-%run "/Users/info@justaboutdata.com/streaming_platform_engine/bronze/bronze_collector"
+%run "/Workspace/Users/info@justaboutdata.com/.bundle/streaming_platform_engine/dev/files/bronze_collector"
 
 # COMMAND ----------
 base = f"/Volumes/platform/dev/streaming_platform/env={env}"

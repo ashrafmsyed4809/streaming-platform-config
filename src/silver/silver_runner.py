@@ -104,7 +104,7 @@ print(f"[runner config] contracts_dir={contracts_dir} run_minutes={run_minutes}"
 # ==========================================================
 # COMMAND ----------
 
-%run "/Users/info@justaboutdata.com/streaming_platform_engine/silver/silver_collector"
+%run "/Workspace/Users/info@justaboutdata.com/.bundle/streaming_platform_engine/dev/files/silver_collector"
 
 
 # COMMAND ----------

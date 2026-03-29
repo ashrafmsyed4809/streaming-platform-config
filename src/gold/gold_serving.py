@@ -89,4 +89,4 @@ print(f"[runner config] allowed_event_types={allowed_event_types}")
 
 # COMMAND ----------
 
-%run "/Users/info@justaboutdata.com/streaming_platform_engine/gold/gold_collector_batch"
+%run "/Workspace/Users/info@justaboutdata.com/.bundle/streaming_platform_engine/dev/files/gold_collector_batch"
