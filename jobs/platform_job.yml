@@ -1,0 +1,99 @@
+resources:
+  jobs:
+    streaming_platform_job:
+      name: "streaming_platform_${bundle.target}"
+
+      max_concurrent_runs: 1
+
+      parameters:
+        - name: env
+          default: ${bundle.target}
+
+        - name: tenant_id
+          default: ${var.tenant_id}
+
+        - name: site_id
+          default: ${var.site_id}
+
+        - name: event_type
+          default: "temp_humidity.v1"
+
+        - name: config_file
+          default: ${var.config_file}
+
+        # ✅ UPDATED — now controlled by bundle variable
+        - name: run_minutes
+          default: ${var.run_minutes}
+
+        - name: event_type_override
+          default: ""
+
+      job_clusters:
+        - job_cluster_key: platform_cluster
+          new_cluster:
+            spark_version: "16.4.x-scala2.12"
+            node_type_id: "Standard_D4ds_v4"
+            num_workers: 1
+            autotermination_minutes: 20
+            data_security_mode: "SINGLE_USER"
+            single_user_name: "info@justaboutdata.com"
+
+            spark_env_vars:
+              EVENTHUB_NAMESPACE_CONN_STR: "{{secrets/streaming-kv/eventhub-namespace-conn-str}}"
+
+            spark_conf:
+              spark.databricks.delta.optimizeWrite.enabled: "true"
+              spark.databricks.delta.autoCompact.enabled: "true"
+
+      tasks:
+        - task_key: bronze
+          job_cluster_key: platform_cluster
+          libraries:
+            - maven:
+                coordinates: "com.microsoft.azure:azure-eventhubs-spark_2.12:2.3.22"
+          notebook_task:
+            notebook_path: "${workspace.file_path}/bundles/streaming_platform/src/bronze/bronze_runner"
+            base_parameters:
+              env: "{{job.parameters.env}}"
+              tenant_id: "{{job.parameters.tenant_id}}"
+              site_id: "{{job.parameters.site_id}}"
+              event_type: "{{job.parameters.event_type}}"
+              config_file: "{{job.parameters.config_file}}"
+              run_minutes: "{{job.parameters.run_minutes}}"
+              event_type_override: "{{job.parameters.event_type_override}}"
+
+        - task_key: silver
+          depends_on:
+            - task_key: bronze
+          job_cluster_key: platform_cluster
+          libraries:
+            - maven:
+                coordinates: "com.microsoft.azure:azure-eventhubs-spark_2.12:2.3.22"
+          notebook_task:
+            notebook_path: "${workspace.file_path}/bundles/streaming_platform/src/silver/silver_runner"
+            base_parameters:
+              env: "{{job.parameters.env}}"
+              tenant_id: "{{job.parameters.tenant_id}}"
+              site_id: "{{job.parameters.site_id}}"
+              event_type: "{{job.parameters.event_type}}"
+              config_file: "{{job.parameters.config_file}}"
+              run_minutes: "{{job.parameters.run_minutes}}"
+              event_type_override: "{{job.parameters.event_type_override}}"
+
+        - task_key: gold
+          depends_on:
+            - task_key: silver
+          job_cluster_key: platform_cluster
+          libraries:
+            - maven:
+                coordinates: "com.microsoft.azure:azure-eventhubs-spark_2.12:2.3.22"
+          notebook_task:
+            notebook_path: "${workspace.file_path}/bundles/streaming_platform/src/gold/gold_serving"
+            base_parameters:
+              env: "{{job.parameters.env}}"
+              tenant_id: "{{job.parameters.tenant_id}}"
+              site_id: "{{job.parameters.site_id}}"
+              event_type: "{{job.parameters.event_type}}"
+              config_file: "{{job.parameters.config_file}}"
+              run_minutes: "{{job.parameters.run_minutes}}"
+              event_type_override: "{{job.parameters.event_type_override}}"

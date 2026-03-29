@@ -1,0 +1,55 @@
+name: CD - Deploy Dev Bundle
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Bundle target to deploy/run (dev or dev_tenant_02)"
+        required: true
+        default: "dev"
+        type: choice
+        options: ["dev", "dev_tenant_02"]
+
+      run_job:
+        description: "Run streaming_platform_job after deploy?"
+        required: false
+        default: "false"
+        type: choice
+        options: ["false", "true"]
+
+      run_minutes:
+        description: "How long to run Bronze/Silver/Gold (minutes)"
+        required: false
+        default: "1"
+
+jobs:
+  deploy-dev:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Databricks CLI
+        uses: databricks/setup-cli@main
+
+      - name: Validate bundle
+        env:
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+        run: databricks bundle validate -t ${{ inputs.target }}
+
+      - name: Deploy bundle
+        env:
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+        run: databricks bundle deploy -t ${{ inputs.target }}
+
+      - name: Smoke run job
+        if: ${{ inputs.run_job == 'true' }}
+        env:
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+        run: |
+          databricks bundle run -t ${{ inputs.target }} \
+            --var run_minutes=${{ inputs.run_minutes }} \
+            streaming_platform_job

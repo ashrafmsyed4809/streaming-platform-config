@@ -1,0 +1,46 @@
+bundle:
+  name: streaming_platform_config
+
+include:
+  - "jobs/*.yml"
+
+sync:
+  include:
+    - "src/**"
+    - "schemas/**"
+    - "rules/**"
+    - "configs/**"
+  exclude:
+    - "**/__pycache__/**"
+    - "**/*.pyc"
+    - "**/*.env"
+    - "**/secrets/**"
+
+variables:
+  tenant_id:
+    description: "Tenant identifier"
+    default: "tenant_demo"
+
+  site_id:
+    description: "Site identifier"
+    default: "site_demo"
+
+  config_file:
+    description: "Path to tenant config file"
+    default: "configs/tenants/tenant_demo/dev.yml"
+
+  run_minutes:
+    description: "How long to run the pipeline in minutes"
+    default: "1"
+
+targets:
+  dev:
+    default: true
+    mode: development
+    workspace:
+      host: "https://adb-3060566723072813.13.azuredatabricks.net"
+    variables:
+      tenant_id: "tenant_demo"
+      site_id: "site_demo"
+      config_file: "configs/tenants/tenant_demo/dev.yml"
+      run_minutes: "1"
