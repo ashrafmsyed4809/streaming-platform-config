@@ -82,8 +82,8 @@ print("\n[DEBUG] config_local_path =", config_local_path)
 print("[DEBUG] tenant_cfg keys =", list(tenant_cfg.keys()))
 print("[DEBUG] ingestion keys =", list(ing_cfg.keys()))
 print("[DEBUG] events keys =", list(events_cfg.keys()))
-print("[DEBUG] device_registry preview =",
-      list((events_cfg.get("device_registry") or {}).items())[:10])
+print("[DEBUG] entity_registry preview =",
+      list((events_cfg.get("entity_registry") or {}).items())[:10])
 print("=============================================\n")
 # ================= DEBUG END =================
 
@@ -95,7 +95,7 @@ allowed_event_types = events_cfg.get("allowed_event_types") or []
 if not allowed_event_types:
     raise Exception("Config error: events.allowed_event_types is empty")
 
-device_registry = events_cfg.get("device_registry") or {}
+entity_registry = events_cfg.get("entity_registry") or {}
 
 # Ingestion source for this tenant (can be overridden by widget)
 source = (ing_cfg.get("source") or "eventhub").strip().lower()
@@ -120,7 +120,7 @@ print(f"[runner config] tenant_id={tenant_id} site_id={site_id}")
 print(f"[runner config] source={source} landing_path={landing_path}")
 print(f"[runner config] source_id={source_id}")
 print(f"[runner config] allowed_event_types={allowed_event_types}")
-print(f"[runner config] device_registry_keys={len(device_registry)} run_minutes={run_minutes}")
+print(f"[runner config] entity_registry_keys={len(entity_registry)} run_minutes={run_minutes}")
 
 # ==========================================================
 # Event Hub setup (ENTERPRISE SAFE)
@@ -167,7 +167,8 @@ queries = run_bronze_collector(
     source_id=source_id,
     landing_path=landing_path,
     allowed_event_types=allowed_event_types,
-    device_registry=device_registry,
+    entity_registry=entity_registry,
+    schemas_base_path=f"{bundle_local_root}/schemas/event_types",
     run_minutes=run_minutes,
     ehConf=ehConf,
     bronze_envelope_path=f"{base}/bronze_envelope_v2",
