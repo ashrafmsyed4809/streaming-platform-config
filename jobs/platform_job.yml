@@ -52,7 +52,7 @@ resources:
             - maven:
                 coordinates: "com.microsoft.azure:azure-eventhubs-spark_2.12:2.3.22"
           notebook_task:
-            notebook_path: "${workspace.file_path}/bundles/streaming_platform/src/bronze/bronze_runner"
+            notebook_path: "${workspace.file_path}/src/bronze/bronze_runner"
             base_parameters:
               env: "{{job.parameters.env}}"
               tenant_id: "{{job.parameters.tenant_id}}"
@@ -70,7 +70,7 @@ resources:
             - maven:
                 coordinates: "com.microsoft.azure:azure-eventhubs-spark_2.12:2.3.22"
           notebook_task:
-            notebook_path: "${workspace.file_path}/bundles/streaming_platform/src/silver/silver_runner"
+            notebook_path: "${workspace.file_path}/src/silver/silver_runner"
             base_parameters:
               env: "{{job.parameters.env}}"
               tenant_id: "{{job.parameters.tenant_id}}"
@@ -88,7 +88,7 @@ resources:
             - maven:
                 coordinates: "com.microsoft.azure:azure-eventhubs-spark_2.12:2.3.22"
           notebook_task:
-            notebook_path: "${workspace.file_path}/bundles/streaming_platform/src/gold/gold_serving"
+            notebook_path: "${workspace.file_path}/src/gold/gold_serving"
             base_parameters:
               env: "{{job.parameters.env}}"
               tenant_id: "{{job.parameters.tenant_id}}"
