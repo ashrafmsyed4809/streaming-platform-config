@@ -1,0 +1,65 @@
+event_type: temp_humidity.v2
+
+rules:
+
+  - name: device_id_required
+    field: device_id
+    type: required
+    severity: error
+
+  - name: event_time_utc_required
+    field: event_time_utc
+    type: required
+    severity: error
+
+  - name: temperature_f_required
+    field: temperature_f
+    type: required
+    severity: error
+
+  - name: humidity_pct_required
+    field: humidity_pct
+    type: required
+    severity: error
+
+  - name: sensor_required
+    field: sensor
+    type: required
+    severity: error
+
+  - name: serial_number_required
+    field: serial_number
+    type: required
+    severity: error
+
+  - name: event_time_parseable
+    field: event_time_utc
+    type: timestamp
+    severity: error
+
+  - name: event_time_not_future
+    field: event_time_utc
+    type: not_future
+    severity: error
+
+  - name: temperature_f_range
+    field: temperature_f
+    type: between
+    min: -50
+    max: 200
+    severity: error
+
+  - name: humidity_pct_range
+    field: humidity_pct
+    type: between
+    min: 0
+    max: 100
+    severity: error
+
+  - name: battery_pct_range
+    field: battery_pct
+    type: between
+    min: 0
+    max: 100
+    allow_null: true
+    severity: warn
