@@ -86,6 +86,8 @@ print(f"[runner params] final_run_minutes={run_minutes}")
 print(f"[runner config] tenant_id={tenant_id} site_id={site_id} event_type={event_type} run_minutes={run_minutes}")
 print(f"[runner config] allowed_event_types={allowed_event_types}")
 # =====================================
+# Add this line right here — before the %run cell
+schemas_base_path = f"{bundle_root}/schemas/event_types"
 
 # COMMAND ----------
 

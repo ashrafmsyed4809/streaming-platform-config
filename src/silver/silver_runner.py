@@ -83,7 +83,7 @@ if not allowed_event_types:
 
 # Where contracts live (20% config; default inside bundle)
 # We'll store per-event contracts in: configs/contracts/<event_type>.yml
-contracts_dir = events_cfg.get("contracts_dir") or "configs/contracts"
+#contracts_dir = events_cfg.get("contracts_dir") or "configs/contracts"
 
 # Storage base path (ONE place to change per client/workspace)
 base_path = storage_cfg.get("base_path")
@@ -97,7 +97,7 @@ if not base_path:
 print(f"[runner config] tenant_id={tenant_id} site_id={site_id}")
 print(f"[runner config] base_path={base_path}")
 print(f"[runner config] allowed_event_types={allowed_event_types}")
-print(f"[runner config] contracts_dir={contracts_dir} run_minutes={run_minutes}")
+#print(f"[runner config] contracts_dir={contracts_dir} run_minutes={run_minutes}")
 
 # ==========================================================
 # Hand-off to Silver Collector (80%)
@@ -115,10 +115,9 @@ queries = run_silver_collector(
     site_id=site_id,
     base_path=base_path,
     allowed_event_types=allowed_event_types,
-    contracts_dir=contracts_dir,
-    bundle_local_root=bundle_local_root,   # lets collector read contract files from bundle deployed path
+    schemas_base_path=f"{bundle_local_root}/schemas/event_types",
     run_minutes=run_minutes,
-    event_type_filter=event_type_filter,   # debug only
+    event_type_filter=event_type_filter,
 )
 
 print("[runner] silver collector started queries:", list(queries.keys()))
