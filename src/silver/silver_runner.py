@@ -104,7 +104,7 @@ print(f"[runner config] allowed_event_types={allowed_event_types}")
 # ==========================================================
 # COMMAND ----------
 
-%run "/Workspace/Users/info@justaboutdata.com/.bundle/streaming_platform_engine/dev/files/silver_collector"
+%run "/Workspace/Users/info@justaboutdata.com/.bundle/streaming_platform_engine/dev/files/src/silver_collector"
 
 
 # COMMAND ----------
