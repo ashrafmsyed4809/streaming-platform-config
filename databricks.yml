@@ -32,11 +32,11 @@ variables:
 
   run_minutes:
     description: "How long to run the pipeline in minutes"
-    default: "1"
+    default: "5"
 
 targets:
   dev:
-    default: true
+    default: trues
     mode: development
     workspace:
       host: "https://adb-3060566723072813.13.azuredatabricks.net"
