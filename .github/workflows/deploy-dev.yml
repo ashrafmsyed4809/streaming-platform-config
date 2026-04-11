@@ -20,7 +20,7 @@ on:
       run_minutes:
         description: "How long to run Bronze/Silver/Gold (minutes)"
         required: false
-        default: "1"
+        default: "5"
 
 jobs:
   deploy-dev:

@@ -44,4 +44,3 @@ targets:
       tenant_id: "tenant_demo"
       site_id: "site_demo"
       config_file: "configs/tenants/tenant_demo/dev.yml"
-      run_minutes: "1"
