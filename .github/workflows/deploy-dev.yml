@@ -51,6 +51,6 @@ jobs:
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
         run: |
           databricks bundle run -t ${{ inputs.target }} \
-            -p run_minutes=${{ inputs.run_minutes }} \
+            --var="run_minutes=${{ inputs.run_minutes }}" \
             streaming_platform_job
    
