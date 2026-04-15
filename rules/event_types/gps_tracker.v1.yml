@@ -31,7 +31,7 @@ rules:
     severity: error
 
   - name: location_required
-    field: location
+    field: gps_location        # ← was "location"
     type: required
     severity: error
     description: "GPS location struct must be present"
@@ -53,7 +53,7 @@ rules:
   # ── Geo bounds (entire world — catches corrupt coordinates) ──
 
   - name: location_bounds_valid
-    field: location
+    field: gps_location        # ← was "location"
     type: geo_bounds
     min_lat: -90
     max_lat:  90

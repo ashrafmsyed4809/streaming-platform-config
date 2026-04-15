@@ -32,7 +32,7 @@ fields:
     nullable: false
     description: "UTC timestamp from device. Format: YYYY-MM-DD HH:MM:SS"
 
-  - name: location
+  - name: gps_location        # ← was "location"
     type: geo_point
     nullable: false
     description: "GPS coordinates — struct with latitude and longitude (WGS84)"
@@ -96,7 +96,7 @@ gold:
     - event_date
     - ingest_time_utc
     - ingest_date
-    - location           # geo_point struct — kept as-is
+    - gps_location           # geo_point struct — kept as-is
     - speed_kmh
     - heading_deg
     - altitude_m
