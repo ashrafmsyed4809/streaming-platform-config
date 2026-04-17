@@ -52,7 +52,7 @@ gold:
     output_subpath: "gold_metrics"
   mode: "daily"
   run_date: ""
-  lookback_days: 1
+  lookback_days: 2
 
   event_types:
     temp_humidity.v2:
