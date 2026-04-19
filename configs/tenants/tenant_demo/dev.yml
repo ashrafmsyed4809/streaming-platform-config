@@ -19,14 +19,15 @@ storage:
 events:
   allowed_event_types:
     # IoT / Sensors
+    # HVAC vertical
+    - "hvac_status.v1"
     - "temp_humidity.v2"
     - "gps_tracker.v1"
     - "rfid_reader.v1"
     - "human_presence.v1"
     # Cold Storage vertical
     - "cold_storage_reading.v1"
-    # HVAC vertical
-    - "hvac_status.v1"
+
 
   entity_registry:
     # IoT sensors (identity_field: device_id — default)
