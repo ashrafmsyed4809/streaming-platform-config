@@ -29,6 +29,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.8
+          terraform_wrapper: false
+
       - name: Setup Databricks CLI
         uses: databricks/setup-cli@main
 
@@ -36,12 +42,16 @@ jobs:
         env:
           DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+          DATABRICKS_TF_EXEC_PATH: /usr/local/bin/terraform
+          DATABRICKS_TF_VERSION: 1.9.8
         run: databricks bundle validate -t ${{ inputs.target }}
 
       - name: Deploy bundle
         env:
           DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+          DATABRICKS_TF_EXEC_PATH: /usr/local/bin/terraform
+          DATABRICKS_TF_VERSION: 1.9.8
         run: databricks bundle deploy -t ${{ inputs.target }}
 
       - name: Smoke run job
@@ -49,8 +59,9 @@ jobs:
         env:
           DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+          DATABRICKS_TF_EXEC_PATH: /usr/local/bin/terraform
+          DATABRICKS_TF_VERSION: 1.9.8
         run: |
           databricks bundle run -t ${{ inputs.target }} \
             --params run_minutes=${{ inputs.run_minutes }} \
             streaming_platform_job
-   
