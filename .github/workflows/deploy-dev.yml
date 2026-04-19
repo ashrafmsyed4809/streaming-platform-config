@@ -35,6 +35,13 @@ jobs:
           terraform_version: 1.9.8
           terraform_wrapper: false
 
+      - name: Locate Terraform binary
+        id: tf
+        run: |
+          TF_PATH=$(which terraform)
+          echo "Found terraform at: $TF_PATH"
+          echo "tf_path=$TF_PATH" >> $GITHUB_OUTPUT
+
       - name: Setup Databricks CLI
         uses: databricks/setup-cli@main
 
@@ -42,7 +49,7 @@ jobs:
         env:
           DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
-          DATABRICKS_TF_EXEC_PATH: /usr/local/bin/terraform
+          DATABRICKS_TF_EXEC_PATH: ${{ steps.tf.outputs.tf_path }}
           DATABRICKS_TF_VERSION: 1.9.8
         run: databricks bundle validate -t ${{ inputs.target }}
 
@@ -50,7 +57,7 @@ jobs:
         env:
           DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
-          DATABRICKS_TF_EXEC_PATH: /usr/local/bin/terraform
+          DATABRICKS_TF_EXEC_PATH: ${{ steps.tf.outputs.tf_path }}
           DATABRICKS_TF_VERSION: 1.9.8
         run: databricks bundle deploy -t ${{ inputs.target }}
 
@@ -59,7 +66,7 @@ jobs:
         env:
           DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
-          DATABRICKS_TF_EXEC_PATH: /usr/local/bin/terraform
+          DATABRICKS_TF_EXEC_PATH: ${{ steps.tf.outputs.tf_path }}
           DATABRICKS_TF_VERSION: 1.9.8
         run: |
           databricks bundle run -t ${{ inputs.target }} \
